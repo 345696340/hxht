@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE replyconf SYSTEM "productionConf.dtd">
+<replyconf>
+	<unicomconf>
+		<ipaddr>127.0.0.1</ipaddr>
+		<addrport>8704</addrport>
+		<spNodeid>3000091444</spNodeid>
+		<spListenPort>8904</spListenPort>
+		<spUserName>openet</spUserName>
+		<spPassword>openet</spPassword>
+		<smgUserName>openet</smgUserName>
+		<smgPassword>openet</smgPassword>
+	</unicomconf>
+	<productconf>
+		<name>DXAC</name>
+		<spnumber>1062836516</spnumber>
+		<servicetype>DXAC</servicetype>
+		<transmitip>192.168.0.6</transmitip>
+		<destport>7750</destport>
+	</productconf>
+	<productconf>
+		<name>WEBAC</name>
+		<spnumber>1062836516</spnumber>
+		<servicetype>WEBAC</servicetype>
+		<transmitip>192.168.0.6</transmitip>
+		<destport>7750</destport>
+	</productconf>
+</replyconf>

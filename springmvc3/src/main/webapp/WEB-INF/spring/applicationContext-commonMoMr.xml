@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:cache="http://www.springframework.org/schema/cache"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+		http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache-4.3.xsd">
+    <!-- 发送计费通知MO队列名称-通用，不更新数据库 -->
+    <bean id="commonPayOrderMoDesc" class="org.apache.activemq.command.ActiveMQTopic">
+        <!-- 设置消息队列的名字 -->
+        <constructor-arg index="0" value="commonPayOrderMo"/>
+    </bean>
+    <!-- 发送计费通知MR队列名称-通用，不更新数据库 -->
+    <bean id="commonPayOrderMrDesc" class="org.apache.activemq.command.ActiveMQTopic">
+        <!-- 设置消息队列的名字 -->
+        <constructor-arg index="0" value="commonPayOrderMr"/>
+    </bean>
+    <!-- MO 发送JMS-通用，不更新数据库 -->
+    <bean id="commonPayOrderMoJmsSend" class="com.game.server.jms.send.MoCommonJmsSend">
+        <property name="jmsTemplate" ref="jmsTemplate"/>
+        <property name="destination" ref="commonPayOrderMoDesc"/>
+    </bean>
+
+    <!-- MR 发送JMS-通用，不更新数据库 -->
+    <bean id="commonPayOrderMrJmsSend" class="com.game.server.jms.send.MrCommonJmsSend">
+        <property name="jmsTemplate" ref="jmsTemplate"/>
+        <property name="destination" ref="commonPayOrderMrDesc"/>
+    </bean>
+
+    <!-- MO jms 消费者 -->
+    <bean id="moCommonJmsMessageListener" class="com.game.server.jms.listener.MoCommonJmsListener">
+        <property name="reportService" ref="reportService"></property>
+    </bean>
+    <!-- MR jms 消费者 -->
+    <bean id="mrCommonJmsMessageListener" class="com.game.server.jms.listener.MrCommonJmsListener">
+        <property name="reportService" ref="reportService"></property>
+    </bean>
+
+    <!-- 消息消费者 一般使用spring的MDP异步接收Queue模式 -->
+    <!-- 消息监听容器 -->
+    <bean id="queueMoCommonContainer"
+          class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+        <property name="connectionFactory" ref="jmsFactory"></property>
+        <property name="destination" ref="commonPayOrderMoDesc"></property>
+        <property name="messageListener" ref="moCommonJmsMessageListener"></property>
+        <!-- 发布订阅模式 -->
+    </bean>
+    <!-- 消息监听容器 -->
+    <bean id="queueMrCommonContainer"
+          class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+        <property name="connectionFactory" ref="jmsFactory"></property>
+        <property name="destination" ref="commonPayOrderMrDesc"></property>
+        <property name="messageListener" ref="mrCommonJmsMessageListener"></property>
+        <!-- 发布订阅模式 -->
+    </bean>
+</beans>

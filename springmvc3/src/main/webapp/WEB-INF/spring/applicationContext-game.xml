@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:cache="http://www.springframework.org/schema/cache"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+		http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache-4.3.xsd">
+    <bean id="mySmsPayOrderMonthMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+        <property name="mapperInterface" value="com.game.server.model.dto.impl.SmsPayOrderMonthMapper"></property>
+        <property name="sqlSessionFactory" ref="sqlSessionFactory"></property>
+    </bean>
+
+    <bean id="myPayOrderInfoMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+        <property name="mapperInterface" value="com.game.server.model.dto.impl.PayOrderInfoMapper"></property>
+        <property name="sqlSessionFactory" ref="sqlSessionFactory"></property>
+    </bean>
+
+    <bean id="myPayOrderGameConfigMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+        <property name="mapperInterface" value="com.game.server.model.dto.impl.PayOrderGameConfigMapper"></property>
+        <property name="sqlSessionFactory" ref="sqlSessionFactory"></property>
+    </bean>
+
+    <bean id="myPayOrderLimitCityMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+        <property name="mapperInterface" value="com.game.server.model.dto.impl.PayOrderLimitCityMapper"></property>
+        <property name="sqlSessionFactory" ref="sqlSessionFactory"></property>
+    </bean>
+
+    <bean id="myPayOrderLimitDateMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+        <property name="mapperInterface" value="com.game.server.model.dto.impl.PayOrderLimitDateMapper"></property>
+        <property name="sqlSessionFactory" ref="sqlSessionFactory"></property>
+    </bean>
+
+    <bean id="myMobileInfoMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+        <property name="mapperInterface" value="com.game.server.model.dto.impl.MobileInfoMapper"></property>
+        <property name="sqlSessionFactory" ref="sqlSessionFactory"></property>
+    </bean>
+
+    <bean id="myGamePayChannel" class="org.mybatis.spring.mapper.MapperFactoryBean">
+        <property name="mapperInterface" value="com.game.server.model.dto.impl.GamePayChannelMapper"></property>
+        <property name="sqlSessionFactory" ref="sqlSessionFactory"></property>
+    </bean>
+
+    <bean id="myPaymentTraceInfoMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+        <property name="mapperInterface" value="com.game.server.model.dto.impl.PaymengtTraceInfoMapper"></property>
+        <property name="sqlSessionFactory" ref="sqlSessionFactory"></property>
+    </bean>
+
+    <bean id="myPaymentTraceSmsInfoMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+        <property name="mapperInterface" value="com.game.server.model.dto.impl.PaymengtTraceSmsInfoMapper"></property>
+        <property name="sqlSessionFactory" ref="sqlSessionFactory"></property>
+    </bean>
+
+    <bean id="myPayOrder" class="org.mybatis.spring.mapper.MapperFactoryBean">
+        <property name="mapperInterface" value="com.game.server.model.dto.impl.PayOrderMapper"></property>
+        <property name="sqlSessionFactory" ref="sqlSessionFactory"></property>
+    </bean>
+
+    <bean id="mySkPayOrderInfoMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+        <property name="mapperInterface" value="com.game.server.model.dto.impl.SkPayOrderInfoMapper"></property>
+        <property name="sqlSessionFactory" ref="sqlSessionFactory"></property>
+    </bean>
+
+    <bean id="mySmsPayOrder" class="org.mybatis.spring.mapper.MapperFactoryBean">
+        <property name="mapperInterface" value="com.game.server.model.dto.impl.SmsPayOrderMapper"></property>
+        <property name="sqlSessionFactory" ref="sqlSessionFactory"></property>
+    </bean>
+
+    <bean id="myPayOrderBackMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+        <property name="mapperInterface" value="com.game.server.model.dto.impl.PayOrderBackMapper"></property>
+        <property name="sqlSessionFactory" ref="sqlSessionFactory"></property>
+    </bean>
+
+    <bean id="mySkSmsPayOrderInfo" class="org.mybatis.spring.mapper.MapperFactoryBean">
+        <property name="mapperInterface" value="com.game.server.model.dto.impl.SkSmsPayOrderInfoMapper"></property>
+        <property name="sqlSessionFactory" ref="sqlSessionFactory"></property>
+    </bean>
+    <bean id="myLimitService" class="com.game.server.service.impl.LimitServiceImpl">
+        <property name="mobileInfoMapper" ref="myMobileInfoMapper"/>
+        <property name="payOrderLimitCityMapper" ref="myPayOrderLimitCityMapper"/>
+        <property name="payOrderLimitDateMapper" ref="myPayOrderLimitDateMapper"/>
+        <property name="redisService" ref="redisService"/>
+        <property name="myPayOrderBackMapper" ref="myPayOrderBackMapper"/>
+    </bean>
+
+    <bean id="reportService" class="com.game.server.service.ReportService">
+        <property name="payOrderGameConfigDAO" ref="myPayOrderGameConfigMapper"/>
+        <property name="myPayOrderInfoDAO" ref="myPayOrderInfoMapper"/>
+        <property name="mySkPayOrderInfoMapper" ref="mySkPayOrderInfoMapper"/>
+    </bean>
+
+    <bean id="jmsFactory" class="org.apache.activemq.pool.PooledConnectionFactory"
+          destroy-method="stop">
+        <property name="connectionFactory">
+            <bean class="org.apache.activemq.ActiveMQConnectionFactory">
+                <property name="brokerURL">
+                    <value>tcp://59.110.1.67:61618</value>
+                </property>
+                <property name="trustAllPackages" value="true"/>
+            </bean>
+        </property>
+        <property name="maxConnections" value="1"></property>
+    </bean>
+
+
+    <!-- Spring JMS Template -->
+    <bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate">
+        <property name="connectionFactory" ref="jmsFactory" />
+            
+        <property name="explicitQosEnabled" value="true"/>
+        <property name="deliveryMode" value="1"/>
+    </bean>
+    <!-- 发送计费通知MO队列名称 -->
+    <bean id="payOrderMoDesc" class="org.apache.activemq.command.ActiveMQTopic">
+        <!-- 设置消息队列的名字 -->
+        <constructor-arg index="0" value="payOrderMo"/>
+    </bean>
+
+    <!-- 发送计费通知MR队列名称 -->
+    <bean id="payOrderMrDesc" class="org.apache.activemq.command.ActiveMQTopic">
+        <!-- 设置消息队列的名字 -->
+        <constructor-arg index="0" value="payOrderMr"/>
+    </bean>
+
+    <!-- 发送计费通知MR队列名称 邮箱专用 -->
+    <bean id="emailPayOrderMoDesc" class="org.apache.activemq.command.ActiveMQTopic">
+        <!-- 设置消息队列的名字 -->
+        <constructor-arg index="0" value="emailPayOrderDesc"/>
+    </bean>
+
+    <!-- MO 发送JMS -->
+    <bean id="payOrderMoJmsSend" class="com.game.server.jms.send.MoJmsSend">
+        <property name="jmsTemplate" ref="jmsTemplate"/>
+        <property name="destination" ref="payOrderMoDesc"/>
+    </bean>
+    <!-- MO 发送JMS邮箱专用 -->
+    <bean id="payOrderMoEmailJmsSend" class="com.game.server.jms.send.MoEmailJmsSend">
+        <property name="jmsTemplate" ref="jmsTemplate"/>
+        <property name="destination" ref="emailPayOrderMoDesc"/>
+    </bean>
+    <!-- MR 发送JMS -->
+    <bean id="payOrderMrJmsSend" class="com.game.server.jms.send.MrJmsSend">
+        <property name="jmsTemplate" ref="jmsTemplate"/>
+        <property name="destination" ref="payOrderMrDesc"/>
+    </bean>
+    <!-- MO jms 消费者 -->
+    <bean id="moJmsMessageListener" class="com.game.server.jms.listener.MoJmsListener">
+        <property name="reportService" ref="reportService"></property>
+    </bean>
+    <!-- MR jms 消费者 -->
+    <bean id="mrJmsMessageListener" class="com.game.server.jms.listener.MrJmsListener">
+        <property name="reportService" ref="reportService"></property>
+    </bean>
+
+    <!-- MR jms 消费者 邮箱专用-->
+    <bean id="moEmailJmsMessageListener" class="com.game.server.jms.listener.MoEmailJmsListener">
+        <property name="reportService" ref="reportService"></property>
+    </bean>
+    <!-- 消息消费者 一般使用spring的MDP异步接收Queue模式 -->
+    <!-- 消息监听容器 -->
+    <bean id="queueMoContainer"
+          class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+        <property name="connectionFactory" ref="jmsFactory"></property>
+        <property name="destination" ref="payOrderMoDesc"></property>
+        <property name="messageListener" ref="moJmsMessageListener"></property>
+        <!-- 发布订阅模式 -->
+    </bean>
+    <!-- 消息消费者 一般使用spring的MDP异步接收Queue模式 -->
+    <!-- 消息监听容器 邮箱专用-->
+    <bean id="queueMoEmailContainer"
+          class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+        <property name="connectionFactory" ref="jmsFactory"></property>
+        <property name="destination" ref="emailPayOrderMoDesc"></property>
+        <property name="messageListener" ref="moEmailJmsMessageListener"></property>
+        <!-- 发布订阅模式 -->
+    </bean>
+    <!-- 消息消费者 一般使用spring的MDP异步接收Queue模式 -->
+    <!-- 消息监听容器 -->
+    <bean id="queueMrContainer"
+          class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+        <property name="connectionFactory" ref="jmsFactory"></property>
+        <property name="destination" ref="payOrderMrDesc"></property>
+        <property name="messageListener" ref="mrJmsMessageListener"></property>
+        <!-- 发布订阅模式 -->
+    </bean>
+
+    <!-- SMS  消费者 -->
+    <bean id="smsJmsMessageListener" class="com.game.server.jms.listener.SmsListener">
+        <property name="myGamePayChannelMapper" ref="myGamePayChannel"/>
+        <property name="myLimitService" ref="myLimitService"/>
+        <property name="myPayOrderGameConfigMapper" ref="myPayOrderGameConfigMapper"/>
+        <property name="myPayOrderMapper" ref="myPayOrder"/>
+        <property name="myPayOrderInfoDAO" ref="myPayOrderInfoMapper"/>
+        <property name="myMoJmsSend" ref="payOrderMoEmailJmsSend"/>
+        <property name="myPayOrderLimitDateMapper" ref="myPayOrderLimitDateMapper"/>
+        <property name="myReportService" ref="reportService"/>
+        <property name="mySmsPayOrderMapper" ref="mySmsPayOrder"/>
+        <property name="mySmsPayOrderMonthMapper" ref="mySmsPayOrderMonthMapper"/>
+        <property name="redisService" ref="redisService"/>
+        <property name="myPaymentTraceServiceImpl" ref="myPaymentTraceServiceImpl"/>
+    </bean>
+    <!-- 发送计费通知MR队列名称 -->
+    <bean id="SmsUpQueue" class="org.apache.activemq.command.ActiveMQTopic">
+        <!-- 设置消息队列的名字 -->
+        <constructor-arg index="0" value="SmsUpQueue"/>
+    </bean>
+    <!-- 消息消费者 一般使用spring的MDP异步接收Queue模式 -->
+    <bean id="queueSmsContainer"
+          class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+        <property name="connectionFactory" ref="jmsFactory"></property>
+        <property name="messageListener" ref="smsJmsMessageListener"></property>
+        <property name="sessionTransacted" value="true"/>
+        <property name="destinationName" value="SmsUpQueue"/>
+        <!-- 发布订阅模式 -->
+    </bean>
+
+
+    <!-- SMS-SUBMIT  消费者 -->
+    <bean id="smsSubmitJmsMessageListener" class="com.game.server.jms.listener.SmsSubmitListener">
+        <property name="mySmsPayOrderMapper" ref="mySmsPayOrder"/>
+        <property name="myReportService" ref="reportService"/>
+        <property name="myLimitService" ref="myLimitService"/>
+        <property name="mySmsPayOrderMonthMapper" ref="mySmsPayOrderMonthMapper"/>
+    </bean>
+    <!-- 发送计费通知MR队列名称 -->
+    <bean id="SmsSubmitUpQueue" class="org.apache.activemq.command.ActiveMQTopic">
+        <!-- 设置消息队列的名字 -->
+        <constructor-arg index="0" value="SmsSubmitUpQueue"/>
+    </bean>
+    <!-- 消息消费者 一般使用spring的MDP异步接收Queue模式 -->
+    <!-- 消息监听容器 -->
+    <bean id="queueSmsSubmitContainer"
+          class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+        <property name="connectionFactory" ref="jmsFactory"></property>
+        <property name="messageListener" ref="smsSubmitJmsMessageListener"></property>
+        <property name="sessionTransacted" value="true"/>
+        <property name="destinationName" value="SmsSubmitUpQueue"/>
+        <!-- 发布订阅模式 -->
+    </bean>
+
+
+    <!-- SMS-REPORT  消费者 -->
+    <bean id="smsReportJmsMessageListener" class="com.game.server.jms.listener.SmsReportListener">
+        <property name="mySmsPayOrderMapper" ref="mySmsPayOrder"/>
+        <property name="myReportService" ref="reportService"/>
+        <property name="myLimitService" ref="myLimitService"/>
+        <property name="myPayOrderGameConfigMapper" ref="myPayOrderGameConfigMapper"/>
+        <property name="myPayOrderLimitDateMapper" ref="myPayOrderLimitDateMapper"/>
+        <property name="mySmsPayOrderMonthMapper" ref="mySmsPayOrderMonthMapper"/>
+    </bean>
+    <!-- 发送计费通知MR队列名称 -->
+    <bean id="SmsReportUpQueue" class="org.apache.activemq.command.ActiveMQTopic">
+        <!-- 设置消息队列的名字 -->
+        <constructor-arg index="0" value="SmsReportUpQueue"/>
+    </bean>
+    <!-- 消息消费者 一般使用spring的MDP异步接收Queue模式 -->
+    <!-- 消息监听容器 -->
+    <bean id="queueSmsReportContainer"
+          class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+        <property name="connectionFactory" ref="jmsFactory"></property>
+        <property name="messageListener" ref="smsReportJmsMessageListener"></property>
+        <property name="sessionTransacted" value="true"/>
+        <property name="destinationName" value="SmsReportUpQueue"/>
+        <!-- 发布订阅模式 -->
+    </bean>
+    <!-- 计费订单轨迹 -->
+    <bean id="myPaymentTraceServiceImpl" class="com.game.server.service.impl.PaymentTraceServiceImpl">
+        <property name="myPaymengtTraceInfoMapper" ref="myPaymentTraceInfoMapper"/>
+        <property name="myPaymengtTraceSmsInfoMapper" ref="myPaymentTraceSmsInfoMapper"/>
+    </bean>
+</beans>

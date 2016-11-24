@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:cache="http://www.springframework.org/schema/cache"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+		http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache-4.3.xsd">
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+          destroy-method="close" lazy-init="false">
+        <property name="driverClass" value="com.mysql.jdbc.Driver"/>
+        <property name="jdbcUrl" value="jdbc:mysql://rm-2zeevow8o2g7u1625o.mysql.rds.aliyuncs.com:3306/game-platform?useUnicode=true&amp;characterEncoding=utf-8"/>
+        <property name="user" value="monty"/>
+        <property name="password" value="jackbupt&amp;2016"/>
+        <property name="initialPoolSize" value="1"/>
+        <property name="minPoolSize" value="1"/>
+        <property name="maxPoolSize" value="2"/>
+        <property name="maxIdleTime" value="18000"/>
+        <property name="testConnectionOnCheckout" value="true"/>
+        <property name="idleConnectionTestPeriod" value="60"/>
+    </bean>
+
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!--<property name="configLocation" value="classpath:Sql-map-config.xml"/>-->
+        <property name="dataSource" ref="dataSource"/>
+        <property name="mapperLocations" value="classpath:sqlmap/*.xml"/>
+    </bean>
+
+</beans>
